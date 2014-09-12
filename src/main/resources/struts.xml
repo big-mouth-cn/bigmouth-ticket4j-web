@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.convention.default.parent.package" value="framework-default" />
+	<constant name="struts.convention.package.locators" value="web" />
+	<constant name="struts.convention.package.locators.basePackage" value="org.bigmouth.ticket4jweb" />
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <constant name="struts.locale" value="zh_CN"></constant>
+    <constant name="struts.ui.theme" value="simple"></constant>
+    <constant name="struts.devMode" value="false"></constant>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"></constant>
+    <constant name="struts.i18n.reload" value="true"></constant>
+    <constant name="struts.serve.static.browserCache" value="false"></constant>
+    <constant name="struts.url.includeParams" value="none"></constant>
+    <constant name="struts.action.extension" value="shtml"/>
+    <constant name="struts.multipart.maxSize" value="100000000" />
+	
+	<package name="framework-default" namespace="/" extends="struts-default">
+		<interceptors>
+			<interceptor-stack name="frameworkStack">
+				<interceptor-ref name="store">
+					<param name="operationMode">AUTOMATIC</param>
+				</interceptor-ref>
+				<interceptor-ref name="paramsPrepareParamsStack" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="frameworkStack" />
+		<default-action-ref name="index" />
+		<global-results>
+			<result name="error">/commons/500.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception" result="error" />
+		</global-exception-mappings>
+
+	</package>
+</struts>

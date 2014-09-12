@@ -1,0 +1,67 @@
+.notifier {
+position: fixed;
+right: 20px;
+top: 70px;
+z-index: 1999;
+}
+.notifier ul {
+list-style: none;
+margin: 0;
+padding: 0;
+}
+.notifier ul li {
+padding: 10px 15px;
+padding-left: 35px;
+/*
+background: -webkit-linear-gradient(top, #ffffff 0%,#e6e6e6 100%);
+background: -o-linear-gradient(top, #ffffff 0%,#e6e6e6 100%);
+background: -ms-linear-gradient(top, #ffffff 0%,#e6e6e6 100%);
+background: linear-gradient(top, #ffffff 0%,#e6e6e6 100%);
+*/
+min-width: 200px;
+box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+border-radius: 5px;
+font-size: 12px;
+margin: 10px 0px;
+}
+.notifier ul li.animateIn {
+  -webkit-animation: slideDown 300ms;
+  -moz-animation: slideDown 300ms;
+  -o-animation: slideDown 300ms;
+}
+
+.notifier ul li.animateOut {
+  -webkit-animation: slideUp 300ms;
+  -moz-animation: slideUp 300ms;
+  -o-animation: slideUp 300ms;
+}
+@-webkit-keyframes slideDown {
+  0%   {
+    opacity: 0; 
+    -webkit-transform: rotateX(-90deg) translate(200px,0px);
+  }
+  100%   {
+    opacity: 1; 
+    -webkit-transform: rotateX(0deg) translate(0px,0px);
+  }
+}
+@-webkit-keyframes slideUp {
+  0%   {
+    opacity: 1; 
+    -webkit-transform: rotateX(0deg) translate(0px,0px);
+  }
+  100%   {
+    opacity: 0; 
+    -webkit-transform: rotateX(-90deg) translate(200px,0px);
+  }
+}
+
+.notifier ul li.info {
+	background: url("info.png") white no-repeat 10px center;
+}
+.notifier ul li.success {
+	background: url("success.png") white no-repeat 10px center;
+}
+.notifier ul li.error {
+	background: url("error.png") white no-repeat 10px center;
+}
