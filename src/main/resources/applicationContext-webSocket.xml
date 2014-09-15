@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="webSocketFactory" class="org.bigmouth.framework.web_socket.WebSocketFactory" init-method="init" destroy-method="destroy">
+		<constructor-arg ref="nativeWebSocket" />
+	</bean>
+	
+	<bean id="nativeWebSocket" class="org.bigmouth.framework.web_socket.ws.NativeWebSocket">
+		<constructor-arg value="${webScoket.host}" />
+		<constructor-arg value="${webSocket.port}" />
+	</bean>
+</beans>

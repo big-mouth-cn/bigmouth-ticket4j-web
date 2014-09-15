@@ -4,7 +4,7 @@ var Global = {
 		InvaildRequest : '非法的请求.'
 	},
 	init : function() {
-		this.appendLoading();
+		//this.appendLoading();
 	},
 	
 	appendLoading : function() {
@@ -25,62 +25,6 @@ var Global = {
 };
 
 var Ajax = {
-	total : 0, // 当前共接收请求数
-	current : 0, // 当前已加载数
-	interval : null,
-	progress : 5,
-	addEventListener : function() {
-		$('.loading').ajaxSend(function() {
-			Ajax.loading();
-		}).ajaxComplete(function(e, xhr, settings) {
-			Ajax.complete();
-		});
-	},
-	isLoadCompleted : function() {
-		return Ajax.total == Ajax.current;
-	},
-	loading : function() {
-		Ajax.total++;
-		if (Ajax.interval) {
-			return;
-		}
-		$('.loading .progress-bar').css('width', Ajax.progress + '%');
-		Ajax.interval = setInterval(function() {
-			$('.loading .progress-bar').css('width', Ajax.progress + '%');
-			// 进度条涨幅度
-			if (Ajax.progress >= 98) {
-			}
-			else if (Ajax.progress >= 70) {
-				Ajax.progress += 1;
-			}
-			else if (Ajax.progress >= 50) {
-				Ajax.progress += 3;
-			}
-			else {
-				Ajax.progress += 5;
-			}
-		}, 100);
-		$('.loading').show();
-	},
-	complete : function() {
-		Ajax.current++;
-		if (Ajax.isLoadCompleted()) {
-			Ajax.total = 0;
-			Ajax.current = 0;
-			$('.loading .progress-bar').animate({
-				'width' : '100%'
-			}, 0, function() {
-				setTimeout(function() {
-					$('.loading').fadeOut('slow');
-				}, 1000);
-				// 加载完成需要清除定时器，并且重置初始长度
-				clearInterval(Ajax.interval);
-				Ajax.interval = null;
-				Ajax.progress = 5;
-			});
-		}
-	},
-		
 	post: function (url, param, success, error) {
 		this.ajax('post', url, param, success, error);
 	},
@@ -282,6 +226,27 @@ var DateUtils = {
 		else
 			return '';
 	}
+};
+
+Date.prototype.Format = function(fmt) {
+	var o = {
+		"M+" : this.getMonth() + 1, // 月份
+		"d+" : this.getDate(), // 日
+		"h+" : this.getHours(), // 小时
+		"m+" : this.getMinutes(), // 分
+		"s+" : this.getSeconds(), // 秒
+		"q+" : Math.floor((this.getMonth() + 3) / 3), // 季度
+		"S" : this.getMilliseconds()
+	// 毫秒
+	};
+	if (/(y+)/.test(fmt))
+		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "")
+				.substr(4 - RegExp.$1.length));
+	for ( var k in o)
+		if (new RegExp("(" + k + ")").test(fmt))
+			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
+					: (("00" + o[k]).substr(("" + o[k]).length)));
+	return fmt;
 };
 
 var Page = {
@@ -641,6 +606,7 @@ var Modal = {
 		this.tags.modal_footer_ok.unbind('click');
 		this.modal().unbind('shown.bs.modal');
 		this.modal().unbind('hidden.bs.modal');
+		this.tags.modal_dialog.removeClass('modal-lg modal-sm');
 	},
 	
 	hideOkButton: function() {
@@ -688,7 +654,6 @@ jQuery(function() {
 	PJax.init();
 	Global.init();
 	Table.init();
-	Ajax.addEventListener();
 	Cookie.init();
 	Modal.init();
 });

@@ -6,7 +6,9 @@ import java.io.PrintWriter;
 import org.apache.commons.io.IOUtils;
 import org.bigmouth.framework.util.DateUtils;
 import org.bigmouth.framework.web.action.json.JsonActionSupport;
+import org.bigmouth.ticket4j.entity.Response;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -28,6 +30,12 @@ public class Ticket4jActionSupport extends JsonActionSupport {
         finally {
             IOUtils.closeQuietly(pw);
         }
+    }
+    
+    protected void doResponse(Response response) {
+        Preconditions.checkNotNull(response, "响应结果为空");
+        int statusCode = response.isContinue() ? 0 : -1; 
+        doResponseObject(statusCode, response.getMessage(), response);
     }
     
     public <T> T fromJson(String json, Class<T> cls) {
