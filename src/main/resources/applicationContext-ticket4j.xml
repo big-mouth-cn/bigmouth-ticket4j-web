@@ -7,7 +7,9 @@
 		<property name="user" ref="user" />
 		<property name="passCode" ref="passCode" />
 	</bean>
-	<bean id="orderService" class="org.bigmouth.ticket4jweb.ticket.service.OrderService"></bean>
+	<bean id="orderService" class="org.bigmouth.ticket4jweb.ticket.service.OrderService">
+		<property name="order" ref="order" />
+	</bean>
 
 	<bean class="org.bigmouth.ticket4jweb.ticket.process.SessionProcessFactory" init-method="init" destroy-method="destroy">
 		<constructor-arg ref="sessionService" />

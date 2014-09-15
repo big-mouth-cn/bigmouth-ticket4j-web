@@ -59,6 +59,22 @@
 		},
 		
 		addEventListener: function() {
+			$(window).bind('sessions.change', function(evt, sessions) {
+				var lis = [];
+				lis.push($('<li class="dropdown-header">请选择账号</li>'));
+				$(sessions).each(function(i, session) {
+					var $li = $('<li>');
+					$li.append('<a href="javascript:;">' + session.username + '</a>');
+					$li.click(function() {
+						$(window).trigger('noComplete.open', [ session ]);
+					});
+					lis.push($li);
+				});
+				$('#noCompleteList').empty();
+				$(lis).each(function() {
+					$('#noCompleteList').append($(this));
+				});
+			});
 			$(window).bind('get.sessions', function(evt, data) {
 				$(data).each(function(i, item) {
 					var session = new Session(item.username);

@@ -6,7 +6,49 @@
 		init : function() {
 			this.addEventListener();
 		},
+		
+		updateStatus : function(data, tr) {
+			var statusCode = data.statusCode;
+			var message = data.message;
+			
+			var $tr = tr;
+			var $status = $tr.find('.status');
+			var $message = $('<span class="label"></span>');
+			$message.html(message);
+			
+			$tr.find('.stop').hide();
+			$tr.find('.start').hide();
+			$tr.find('.remove').hide();
+			
+			if (statusCode == 1) { // Completed
+				$message.addClass('label-success');
+				$tr.find('.remove').show();
+			}
+			else if (statusCode == 0) { // Process
+				$message.addClass('label-primary');
+				$tr.find('.stop').show();
+			}
+			else if (statusCode == 2) { // Stop
+				$message.addClass('label-default');
+				$tr.find('.start').show();
+			}
+			else if (statusCode == 4) { // Wait
+				$message.addClass('label-info');
+			}
+			else {
+				$message.addClass('label-danger');
+				$tr.find('.start').show();
+			}
+			$status.empty();
+			$status.append($message);
+		},
+		
 		addEventListener: function() {
+			$(window).bind('ORDER_EVENT', function(evt, data) {
+				var $tr = $('#' + data.id);
+				order.updateStatus(data, $tr);
+			});
+			
 			var popover= function(sessions) {
 				var body = $('<div>');
 				var content = $('<div>');
@@ -62,6 +104,9 @@
 					$('#tblTickets .empty').removeClass('hide');
 				}
 			});
+			$(window).bind('order.remove.successful', function(evt, id, data) {
+				$('#'+id).remove();
+			});
 			
 			this.remote.list();
 		},
@@ -73,12 +118,49 @@
 				}, function(json) {
 					if (Response.ok(json)) {
 						$.notifier.success('订单添加成功，系统将开始进行购票。');
+						entity.id = json.Data.id;
 						$(window).trigger('order.render', [ entity ]);
 						$('#tblTickets').trigger('change');
 						Modal.close();
 					}
 					else {
 						$.notifier.error('订单添加失败！' + json.Message);
+					}
+				});
+			},
+			start: function(id) {
+				Ajax.get(window.baseUrl + '/order!start.shtml', {
+					id : id
+				}, function(json) {
+					if (Response.ok(json)) {
+						$(window).trigger('order.start.successful', [ json.Data ]);
+					}
+					else {
+						$.notifier.error('订单开始处理失败！' + json.Message);
+					}
+				});
+			},
+			stop: function(id) {
+				Ajax.get(window.baseUrl + '/order!stop.shtml', {
+					id : id
+				}, function(json) {
+					if (Response.ok(json)) {
+						$(window).trigger('order.stop.successful', [ json.Data ]);
+					}
+					else {
+						$.notifier.error('订单停止处理失败！' + json.Message);
+					}
+				});
+			},
+			remove: function(id) {
+				Ajax.get(window.baseUrl + '/order!remove.shtml', {
+					id : id
+				}, function(json) {
+					if (Response.ok(json)) {
+						$(window).trigger('order.remove.successful', [ id, json.Data ]);
+					}
+					else {
+						$.notifier.error('订单删除失败！' + json.Message);
 					}
 				});
 			},
@@ -418,8 +500,7 @@
 		
 		createOrderForRender : function(entity) {
 			var tr = $('<tr>');
-			tr.attr('id', 'ORDER_' + entity.id);
-			tr.data('id', entity.id);
+			tr.attr('id', entity.id);
 			
 			var trainDate = $('<td>'+entity.trainDate+'</td>');
 			var startStation = $('<td>'+entity.startStation+'</td>');
@@ -459,13 +540,42 @@
 			$(entity.passengers).each(function(i, item) {
 				passengers.find('ul').append('<li>' + item.name + '</li>');
 			});
-			var status = $('<td></td>');
+			var status = $('<td class="status"></td>');
 			status.append('<span class="label label-success">正在初始化</span>');
 			
 			var opera = $('<td>');
 			
+			var $start = $('<a href="javascript:;" class="start glyphicon glyphicon-play" title="开始处理"></a>');
+			$start.data('id', entity.id);
+			$start.bind('click', function() {
+				var id = $(this).data('id');
+				order.remote.start(id);
+			});
+			
+			var $stop = $('<a href="javascript:;" class="stop glyphicon glyphicon-stop" title="停止处理"></a>');
+			$stop.data('id', entity.id);
+			$stop.bind('click', function() {
+				var id = $(this).data('id');
+				Alert.confirm('您确定要停止处理这个订单吗？', function() {
+					order.remote.stop(id);
+				});
+			});
+			
+			var $remove = $('<a href="javascript:;" class="remove glyphicon glyphicon-trash" title="删除"></a>');
+			$remove.data('id', entity.id);
+			$remove.bind('click', function() {
+				var id = $(this).data('id');
+				Alert.confirm('您确定要删除处理这个订单吗？', function() {
+					order.remote.remove(id);
+				});
+			});
+			
+			opera.append($start).append($stop).append($remove);
+			
 			tr.append(trainDate).append(startStation).append(endStation).append(includes).append(excludes).append(seatTypes).append(passengers).append(status).append(opera);
 			$('#tblTickets tbody').append(tr);
+			
+			order.updateStatus(entity, tr);
 		}
 	}
 	

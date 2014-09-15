@@ -70,35 +70,17 @@ var Tags = {
 };
 
 var Alert = {
-	info: function(text, fn) {
-		Dialog.show(text, null, fn);
-	},
-	success: function(text, fn) {
-		Dialog.success(text, null, fn);
-	},
-	warn: function(text, fn) {
-		Dialog.show(text, null, fn);
-	},
-	error: function(text, fn) {
-		Dialog.error(text, null, fn);
-	},
-	confirm: function(text, fn) {
-		Dialog.confirm(text, null, function() {
-			if (!!fn) fn();
+	confirm: function(text, fn, cancel) {
+		Modal.open({
+			body : text,
+			title : '肿么办',
+			backdrop : 'static',
+			okHandler : function() {
+				if (fn) fn();
+				Modal.close();
+			},
+			closeHandler : cancel
 		});
-	},
-	/**
-	 * options {
-	 * 	  content(String),
-	 *    title(String),
-	 *    clickHandler(Function),
-	 *    cancelHandler(Function),
-	 *    clickText(String),
-	 *    cancelText(String)
-	 * }
-	 */
-	customConfirm : function(options) {
-		Dialog.customConfirm(options);
 	}
 };
 

@@ -6,15 +6,18 @@
 
 	$(function() {
 		socket.onopen = function(event) {
-			$.notifier.success('WebSocket服务初始化成功，已连接到 ' + window.websocket);
-			
 			socket.onmessage = function(event) {
-				console.log(event.data);
+				var data = event.data;
+				if (typeof (data) != 'undefined') {
+					var json = JSON.parse(data);
+					var messageType = json.messageType;
+					$(window).trigger(messageType, [ json.data ]);
+				}
 			};
 		};
 		
 		socket.onerror = function(event) {
-			$.notifier.error('系统初始化失败，无法连接：' + window.websocket);
+			$.notifier.error('无法连接：' + window.websocket);
 		};
 	});
 })(jQuery);

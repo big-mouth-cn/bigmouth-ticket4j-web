@@ -17,7 +17,7 @@
 	<link rel="shortcut icon" href="${ctx }/images/favicon.png">
 
 	<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css">
-	<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<!-- 	<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"> -->
 	<link href="${ctx }/css/sticky-footer-navbar.css" rel="stylesheet">
 	<link href="${ctx }/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 	<link href="${ctx }/css/big-mouth.common.css" rel="stylesheet">
@@ -77,6 +77,7 @@
 		text-align: center;
 		white-space: nowrap;
 		vertical-align: middle;
+		cursor: pointer;
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
@@ -84,22 +85,22 @@
 		background-image: none;
 		border: 1px solid transparent;
 		border-radius: 4px;
-		text-shadow: 0 1px 0 #fff;
-		background-image: -webkit-linear-gradient(top,#fff 0,#e0e0e0 100%);
-		background-image: -o-linear-gradient(top,#fff 0,#e0e0e0 100%);
-		background-image: -webkit-gradient(linear,left top,left bottom,from(#fff),to(#e0e0e0));
-		background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
-		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe0e0e0', GradientType=0);
-		filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
-		background-repeat: repeat-x;
-		border-color: #dbdbdb;
-		border-color: #ccc;
 		cursor: default;
+		color: #333;
+		background-color: #fff;
+		border-color: #ccc;
 	}
+	a.glyphicon:LINK {
+		color: #333;
+		text-decoration: none;
+	}
+	
+	.loading {height: 105px;background: url('images/loading.gif') no-repeat center top;}
+	.loading .span {text-align: center;padding-top: 65px;}
 	</style>
 </head>
 <body>
-	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -112,7 +113,13 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">自助订票</a></li>
+            <li class="active"><a href="#">订票</a></li>
+            <li class="dropdown">
+            	<a href="#" class="dropdown-toggle" data-toggle="dropdown">待支付订单<b class="caret"></b></a>
+            	<ul id="noCompleteList" class="dropdown-menu">
+            		<li class="dropdown-header">请选择账号</li>
+            	</ul>
+            </li>
             <li><a href="#settings">系统设置</a></li>
             <li><a href="#about">关于</a></li>
             <li><a href="#donations">捐助</a></li>
@@ -131,8 +138,8 @@
     	</div>
     	
     	<div class="panel panel-default">
-    		<div class="panel-heading">正在进行</div>
-   			<table id="tblTickets" class="table table-striped">
+    		<div class="panel-heading">订单处理</div>
+   			<table id="tblTickets" class="table">
    				<thead>
    					<tr>
    						<th width="120">乘车日期</th>
@@ -143,12 +150,12 @@
    						<th width="100">席别</th>
    						<th width="100">乘车人</th>
    						<th>状态</th>
-   						<th></th>
+   						<th width="50"></th>
    					</tr>
    				</thead>
    				<tbody>
    					<tr class="empty">
-   						<td colspan="9"><div class="alert alert-warning">暂时没有正在进行的订单，您可以单击“添加订单”开始进行购票。</div></td>
+   						<td colspan="9"><div class="alert alert-info" style="margin-bottom: 0px;">暂时没有正在处理的订单，您可以单击“添加订单”开始进行购票。</div></td>
    					</tr>
    				</tbody>
    			</table>
@@ -169,3 +176,4 @@
 <script src="https://kyfw.12306.cn/otn/resources/js/framework/station_name.js?station_version=1.809"></script>
 <script src="${ctx }/js/session/session.js"></script>
 <script src="${ctx }/js/ticket4j/order.js"></script>
+<script src="${ctx }/js/ticket4j/noComplete.js"></script>

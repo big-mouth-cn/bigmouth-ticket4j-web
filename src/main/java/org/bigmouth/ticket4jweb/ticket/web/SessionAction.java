@@ -89,13 +89,6 @@ public class SessionAction extends Ticket4jActionSupport {
         }
     }
 
-    private Ticket4jHttpResponse getTicket4jHttpResponse() {
-        String parameter = getParameter("ticket4jHttpResponse");
-        Preconditions.checkArgument(StringUtils.isNotBlank(parameter), "没有初始化成功");
-        Ticket4jHttpResponse ticket4jHttpResponse = fromJson(parameter, Ticket4jHttpResponse.class);
-        return ticket4jHttpResponse;
-    }
-
     public void setInitialize(Initialize initialize) {
         this.initialize = initialize;
     }
