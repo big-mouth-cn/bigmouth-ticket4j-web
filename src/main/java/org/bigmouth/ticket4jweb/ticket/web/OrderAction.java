@@ -33,7 +33,7 @@ public class OrderAction extends Ticket4jActionSupport {
             Ticket4jOrder entity = fromJson(order, Ticket4jOrder.class);
             orderService.write(entity);
             orderProcessFactory.putPool(entity.getId());
-            succeed(entity);
+            succeed(orderService.getOrder(entity.getId())); // Get new status.
         }
         catch (Exception e) {
             failed(e.getMessage());

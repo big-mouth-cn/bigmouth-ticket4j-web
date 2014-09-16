@@ -100,6 +100,17 @@
 	</style>
 </head>
 <body>
+    <div class="alert alert-block nosupport hide">
+        <h4>浏览器版本不支持</h4>
+        <hr>
+        <p>您知道不？现在您使用的是十年前的浏览器！</p>
+        <p>假如世界上的更多的人都像您这样不愿意接受新技术、新科技，那么世界将被你们阻止进步。</p>
+        <p>我们呼吁您，紧跟科技的脚步前行，您会发现更多的精彩。</p>
+        <p>下面您可以<a href="http://windows.microsoft.com/zh-cn/internet-explorer/downloads/ie-10/worldwide-languages" target="_blank">升级</a>您的浏览器版本或使用 <a href="http://www.google.com/intl/zh-CN/chrome/browser/" target="_blank">Chrome</a> 或 <a href="http://www.apple.com.cn/safari/" target="_blank">Safari</a> 等高级浏览器。</p>
+        <hr>
+        <p><i>如果您用的是360、猎豹等国内浏览器，请开启极速模式后再试。仍然出现此错误，请更换浏览器。</i></p>
+    </div>
+
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
@@ -120,9 +131,9 @@
             		<li class="dropdown-header">请选择账号</li>
             	</ul>
             </li>
-            <li><a href="#settings">系统设置</a></li>
-            <li><a href="#about">关于</a></li>
-            <li><a href="#donations">捐助</a></li>
+            <li><a href="http://www.12306.cn/mormhweb/zxdt/201305/t20130516_600.html" target="_blank">起售时刻表</a></li>
+            <li><a href="javascript:;" id="about">关于</a></li>
+            <li><a href="javascript:;" id="donations">捐助</a></li>
           </ul>
         </div>
       </div>
@@ -170,10 +181,41 @@
         <p class="text-muted">&copy; 2014 <a href="http://www.big-mouth.cn" target="_blank">big-mouth.cn</a></p>
       </div>
     </div>
-    
 </body>
 </html>
 <script src="https://kyfw.12306.cn/otn/resources/js/framework/station_name.js?station_version=1.809"></script>
 <script src="${ctx }/js/session/session.js"></script>
 <script src="${ctx }/js/ticket4j/order.js"></script>
 <script src="${ctx }/js/ticket4j/noComplete.js"></script>
+<script src="${ctx }/js/about/about.js"></script>
+<script language="JavaScript">  
+function isSupport() {
+	if (navigator.userAgent.indexOf("MSIE 6.0") > 0 || 
+			navigator.userAgent.indexOf("MSIE 7.0") > 0 ||
+			navigator.userAgent.indexOf("MSIE 8.0") > 0) {
+		return false;
+	}
+	if (navigator.userAgent.indexOf("Chrome") > 0) {
+		var reg = new RegExp('Chrome/\\d{2}');
+		var v = reg.exec(navigator.userAgent);
+		if (v.length > 0) {
+			if (v[0].split('/')[1] <= 32) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+var support = isSupport();
+if (support) {
+	$('.nosupport').remove();
+}
+else {
+	$('.nosupport').removeClass('hide');
+	$('body').children().each(function() {
+		if (!$(this).hasClass('nosupport')) {
+			$(this).remove();
+		}
+	});
+}
+</script>

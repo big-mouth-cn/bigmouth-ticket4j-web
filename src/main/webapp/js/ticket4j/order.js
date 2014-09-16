@@ -210,13 +210,13 @@
 			'		<span class="help-block">添加后将只会预订包含在内的车次，不添加则默认预订所有车次</span>'+
 			'	</div>'+
 			'  </div>'+
-			'  <div class="form-group">'+
+			'  <div id="div-includes" class="form-group hide">'+
 			'	<div class="col-sm-offset-2 col-sm-9">'+
 			'		<ul id="includes" class="list">'+
 			'		</ul>'+
 			'	</div>'+
 			'  </div>'+
-			'  <div class="form-group">'+
+			'  <div id="control-excludes" class="form-group">'+
 			'	<label class="col-sm-2 control-label">黑名单</label>'+
 			'	<div class="col-sm-9">'+
 			'		<div class="input-group col-sm-3">'+
@@ -228,7 +228,7 @@
 			'		<span class="help-block">添加后不会预订包含在内的车次</span>'+
 			'	</div>'+
 			'  </div>'+
-			'  <div class="form-group">'+
+			'  <div id="div-excludes" class="form-group hide">'+
 			'	<div class="col-sm-offset-2 col-sm-9">'+
 			'		<ul id="excludes" class="list"></ul>'+
 			'	</div>'+
@@ -249,7 +249,7 @@
 			'		<span class="help-block">将只会预订已选择的席别，靠前的席别优先预订。如果不指定则预订任意席别</span>'+
 			'	</div>'+
 			'  </div>'+
-			'  <div class="form-group">'+
+			'  <div id="div-seatTypes" class="form-group hide">'+
 			'	<label class="col-sm-2 control-label">席别顺序</label>'+
 			'	<div class="col-sm-9">'+
 			'		<div class="row">'+
@@ -258,6 +258,17 @@
 			'			</div>'+
 			'		</div>'+
 			'		<span class="help-block">拖动可调整席别的顺序</span>'+
+			'	</div>'+
+			'  </div>'+
+			'  <div id="div-order" class="form-group hide">'+
+			'	<label class="col-sm-2 control-label">优先条件</label>'+
+			'	<div class="col-sm-9">'+
+			'     <label class="radio-inline">'+
+			'       <input type="radio" name="orderBy" id="orderTrain" value="ORDER_TRAIN"> 按指定车次优先'+
+			'     </label>'+
+			'     <label class="radio-inline">'+
+			'       <input type="radio" name="orderBy" id="orderSeat" value="ORDER_SEAT" checked="checked"> 按席别顺序优先'+
+			'     </label>'+
 			'	</div>'+
 			'  </div>'+
 			'  <div class="form-group">'+
@@ -347,10 +358,11 @@
 					});
 					
 					
-					var getAllowRmoveLi = function(text) {
+					var getAllowRmoveLi = function(text, clickHandler) {
 						var li = $('<li class="autohide" data-value="'+text+'"><span>'+text+'</span><a href="javascript:;" class="glyphicon glyphicon-remove remove"></a></li>');
 						li.find('a').click(function() {
 							$(this).parent().remove();
+							if (clickHandler) clickHandler();
 						});
 						return li;
 					}
@@ -370,7 +382,20 @@
 						if (StringUtils.isBlank(val))
 							return;
 						$('#iptIncludes').val('');
-						$('#includes').append(getAllowRmoveLi(val));
+						var li = getAllowRmoveLi(val, function() {
+							if ($('#includes').children().length == 0) {
+								$('#div-includes').addClass('hide');
+								$('#div-order').addClass('hide');
+								$('#control-excludes').removeClass('hide');
+								$('#orderSeat').prop('checked', true);
+							}
+						});
+						$('#includes').append(li);
+						if ($('#includes').children().length > 0) {
+							$('#div-includes').removeClass('hide');
+							$('#div-order').removeClass('hide');
+							$('#control-excludes').addClass('hide');
+						}
 					});
 					// 排除车次事件
 					$('#iptExcludes').keyup(function() {
@@ -387,7 +412,14 @@
 						if (StringUtils.isBlank(val))
 							return;
 						$('#iptExcludes').val('');
-						$('#excludes').append(getAllowRmoveLi(val));
+						var li = getAllowRmoveLi(val, function() {
+							if ($('#excludes').children().length == 0)
+								$('#div-excludes').addClass('hide');
+						});
+						$('#excludes').append(li);
+						if ($('#excludes').children().length > 0) {
+							$('#div-excludes').removeClass('hide');
+						}
 					});
 					
 					// 席别选择事件
@@ -405,6 +437,12 @@
 									$(this).remove();
 								}
 							});
+						}
+						if ($('#selectedSeatType').children().length > 0) {
+							$('#div-seatTypes').removeClass('hide');
+						}
+						else {
+							$('#div-seatTypes').addClass('hide');
 						}
 					});
 					$('#tblPassenger').bind('render', function(evt, data) {
@@ -466,6 +504,8 @@
 							});
 						});
 						
+						var orderBy = $('input[name="orderBy"]:checked').val();
+						
 						var passengers = [];
 						$tblPassenger.find('tbody input:checked').each(function() {
 							passengers.push({
@@ -489,6 +529,7 @@
 							includes : includes,
 							excludes : excludes,
 							seatTypes : seatTypes,
+							orderBy : orderBy,
 							passengers : passengers
 						};
 						$(window).trigger('create.order', [ order ]);

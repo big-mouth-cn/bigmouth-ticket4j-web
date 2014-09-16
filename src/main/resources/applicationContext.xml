@@ -25,7 +25,6 @@
 				<value>classpath:application.properties</value>
 				<value>classpath:config/kyfw.properties</value>
 				<value>classpath:config/dns.properties</value>
-				<value>classpath:ticket4j.properties</value>
 			</list>
 		</property>
 	</bean>

@@ -3,6 +3,7 @@ package org.bigmouth.ticket4jweb.ticket.entity;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.bigmouth.ticket4j.entity.OrderBy;
 
 
 public class Ticket4jOrder implements Serializable {
@@ -19,6 +20,7 @@ public class Ticket4jOrder implements Serializable {
     private String[] excludes;
     private Ticket4jSeat[] seatTypes;
     private Ticket4jPassenger[] passengers;
+    private OrderBy orderBy = OrderBy.ORDER_SEAT;
     
     public static final int NORMAL = 0;
     public static final int COMPLETED = 1;
@@ -36,9 +38,17 @@ public class Ticket4jOrder implements Serializable {
     public static final int RUNTIME = -7;
     
     //
-    private int statusCode;
-    private String message;
+    private int statusCode = Ticket4jOrder.WAIT;
+    private String message = "等待进入处理队列";
     
+    public OrderBy getOrderBy() {
+        return orderBy;
+    }
+    
+    public void setOrderBy(OrderBy orderBy) {
+        this.orderBy = orderBy;
+    }
+
     public int getStatusCode() {
         return statusCode;
     }

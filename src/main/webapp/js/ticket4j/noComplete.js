@@ -22,7 +22,7 @@
 						$(window).bind('noComplete.load.successful', function(e, data) {
 							var orderDBList = data.data.orderDBList;
 							body.find('.loading').hide();
-							if (orderDBList.length == 0) {
+							if (!orderDBList || orderDBList.length == 0) {
 								body.find('.nodata').removeClass('hide');
 							}
 							else {

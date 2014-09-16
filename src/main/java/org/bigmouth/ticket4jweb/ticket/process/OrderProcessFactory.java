@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -43,6 +44,7 @@ import org.bigmouth.ticket4jweb.ticket.entity.Ticket4jPassenger;
 import org.bigmouth.ticket4jweb.ticket.entity.Ticket4jSeat;
 import org.bigmouth.ticket4jweb.ticket.entity.WebSocketMessage;
 import org.bigmouth.ticket4jweb.ticket.entity.WebSocketMessageType;
+import org.bigmouth.ticket4jweb.ticket.process.thread.QueryTicketRunnable;
 import org.bigmouth.ticket4jweb.ticket.service.OrderService;
 import org.bigmouth.ticket4jweb.ticket.service.SessionService;
 
@@ -59,6 +61,9 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     private static final Map<String, Ticket4jOrder> PROCESS_QUEUE = Maps.newConcurrentMap();
     private static final Map<String, Ticket4jOrder> STOP_QUEUE = Maps.newConcurrentMap();
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5, Executors.defaultThreadFactory());
+    
+    private static final int QUERY_TICKET_THREAD_COUNT = 5;
+    private static final ExecutorService QUERY_TICKET_EXECUTOR = Executors.newFixedThreadPool(QUERY_TICKET_THREAD_COUNT, Executors.defaultThreadFactory());
     
     private final OrderService orderService;
     private final SessionService sessionService;
@@ -138,6 +143,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                 condition.setExcludeTrain(Lists.newArrayList(excludes));
                 condition.setSeats(seats);
                 condition.setTicketQuantity(passengers.length);
+                condition.setOrderBy(ticket4jOrder.getOrderBy());
                 
                 List<Train> allows = null;
                 do {
@@ -147,12 +153,22 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                         print(ticket4jOrder, Ticket4jOrder.STOP, "订单已停止");
                         return;
                     }
-                    print(ticket4jOrder, "正在查票");
+                    print(ticket4jOrder, String.format("(%s)线程正在查票中", QUERY_TICKET_THREAD_COUNT));
                     try {
-                        QueryTicketResponse queryTicketResponse = ticket.query(ticket4jHttpResponse, condition);
-                        if (null == queryTicketResponse)
-                            continue;
-                        allows = queryTicketResponse.getAllows();
+                        List<Future<QueryTicketResponse>> futures = Lists.newArrayList();
+                        for (int i = 0; i < QUERY_TICKET_THREAD_COUNT; i++) {
+                            Future<QueryTicketResponse> future = QUERY_TICKET_EXECUTOR.submit(new QueryTicketRunnable(ticket, ticket4jHttpResponse, condition));
+                            futures.add(future);
+                        }
+                        for (Future<QueryTicketResponse> future : futures) {
+                            QueryTicketResponse queryTicketResponse = future.get();
+                            if (null != queryTicketResponse) {
+                                allows = queryTicketResponse.getAllows();
+                                if (CollectionUtils.isNotEmpty(allows)) {
+                                    break;
+                                }
+                            }
+                        }
                         if (CollectionUtils.isEmpty(allows)) {
                             sleep(MILLIS);
                         }
@@ -311,6 +327,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                     String orderId = waitTimeResponse.getData().getOrderId();
                     if (StringUtils.isBlank(orderId)) {
                         print(ticket4jOrder, Ticket4jOrder.WAIT_TIME, waitTimeResponse.getMessage());
+                        PROCESS_QUEUE.remove(id);
                         continue;
                     }
                     

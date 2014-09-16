@@ -63,8 +63,6 @@
 
 	<bean id="user" class="org.bigmouth.ticket4j.impl.DefaultUser">
 		<constructor-arg ref="ticket4jHttpClient" />
-		<constructor-arg value="${user.username}" />
-		<constructor-arg value="${user.password}" />
 		<property name="uriLogin" value="${uri.login}" />
 		<property name="uriCheckUser" value="${uri.check.user}" />
 		<property name="uriPassengersQuery" value="${uri.passengers.query}" />
@@ -87,24 +85,6 @@
 	</bean>
 
 	<bean id="cookieCache" class="org.bigmouth.ticket4j.cookie.DefaultCookieCache" />
-
-	<bean id="ticketProcess" class="org.bigmouth.ticket4j.TicketProcess">
-		<constructor-arg ref="cookieCache" />
-		<constructor-arg ref="anti" />
-		<constructor-arg ref="ticketReport" />
-
-		<property name="passengers" value="${passengers}" />
-		<property name="seatSource" value="${seats}" />
-		<property name="trainDate" value="${train.date}" />
-		<property name="trainFrom" value="${train.from}" />
-		<property name="trainTo" value="${train.to}" />
-		<property name="includeSource" value="${train.includes}" />
-		<property name="excludeSource" value="${train.excludes}" />
-		<property name="queryTicketSleepTime" value="${query.ticket.sleep.time}" />
-		<property name="recognition" value="${identifying.code.recognition}" />
-		<property name="strGivenTime" value="${query.ticket.given.time}" />
-		<property name="stopMinutesAgo" value="${query.ticket.stop.minutes.ago}" />
-	</bean>
 
 	<bean id="anti" class="org.bigmouth.ticket4j.utils.AntiUtils"
 		init-method="initialize" destroy-method="destroy">

@@ -73,7 +73,7 @@ var Alert = {
 	confirm: function(text, fn, cancel) {
 		Modal.open({
 			body : text,
-			title : '肿么办',
+			title : '系统询问',
 			backdrop : 'static',
 			okHandler : function() {
 				if (fn) fn();
@@ -186,27 +186,6 @@ var DateUtils = {
 	},
 	getCurrent : function() {
 		return this.format(new Date());
-	},
-	
-	getRemind: function() {
-		var date = new Date();
-		var hour = date.getHours();
-		if (hour > 5 && hour < 8)
-			return '早上好！来一份营养早餐吧。';
-		else if (hour < 12)
-			return '上午好！';
-		else if (hour < 14)
-			return '中午好，忙碌了一个上午累了吧。休息休息，养足精神。';
-		else if (hour < 18)
-			return '下午好！';
-		else if (hour < 21)
-			return '晚上好！';
-		else if (hour < 23)
-			return '快到睡觉的时间咯！';
-		else if (hour > 23 || hour < 5)
-			return '夜深了，怎么还不休息呢？';
-		else
-			return '';
 	}
 };
 
@@ -235,202 +214,6 @@ var Page = {
 	jump: function(pageNo) {
 		jQuery("#pageNo").val(pageNo);
 		jQuery("#mainForm").submit();
-	}
-};
-
-var Table = {
-	init: function() {
-		this.addEventListener();
-		this.short();
-	},
-	addEventListener: function() {
-		
-		$('input.search-input').each(function() {
-			$(this).keydown(function(event) {
-				if(event.keyCode==13) Table.search();
-			});
-		});
-		
-		// this.hover();
-	},
-	
-	hover: function() {
-		$('table tr').each(function() {
-			var tr = $(this);
-			var hoverIn = function() {
-				tr.find('div.operation').fadeIn(300);
-			};
-			var hoverOut = function() {
-				tr.find('div.operation').hide();
-			};
-			tr.hover(hoverIn, hoverOut);
-		});
-	},
-	
-	// 指定TD.short的单元格，将会对显示的文字进行截断，并设置title为完整值。
-	short: function() {
-		var tds = $("td.short");
-		tds.each(function() {
-			var td = $(this);
-			var len = td.attr("maxlength");
-			var text = td.text();
-			if (text.length > parseInt(len)) {
-				var span = $("<abbr>"+ text.substring(0, len) + "...</abbr>");
-				span.attr("title", text);
-				td.html(span);
-			}
-		});
-	},
-	search: function() {//搜索后显示第一页
-		jQuery("#pageNo").val("1");
-		jQuery("#mainForm").submit();
-	},
-	
-	edit: function(primary, uri) {
-		location.href = window.baseUrl + uri + primary;
-	},
-	
-	// remove
-	remove: function(primary, uri) {
-		Alert.confirm(Global.Msg.DeleteConfirm, function() {
-			location.href = window.baseUrl + uri + primary;
-		});
-	},
-	
-	removeAsyn: function(primary, url, success) {
-		Alert.confirm(Global.Msg.DeleteConfirm, function() {
-			var param = { id : primary };
-			Ajax.get(url, param, success);
-		});
-	}
-};
-
-var Dialog = {
-	width: 480,
-	
-	buildDiv : function() {
-		var dialog = document.getElementById("dialog");
-		if (dialog == undefined) 
-		{
-			$("body").append("<div id='dialog'></div>");
-		}
-	},
-	buildDialog : function(title, buttons) {
-		$("#dialog").dialog({
-			width: Dialog.width,
-			title: StringUtils.isBlank(title) ? '系统提示' : title,
-			resizable: false,
-			modal: true,
-			open: function(event, ui) {
-				Dialog.enabledMouseWheel(false);
-			},
-			close: function(event, ui) {
-				Dialog.enabledMouseWheel(true);
-			},
-			buttons: buttons
-		});
-		this.settingContentPadding();
-	},
-	settingHtml: function(className, content) {
-		Dialog.buildDiv();
-		$("#dialog").html('');
-		$("#dialog").html("<div class='" + className + "'><div class='content'>" + content + "</div></div>");
-	},
-	getOk: function(fn) {
-		var buttons = 
-			[
-			    {
-			    	text : "确定",
-			    	class: 'btn btn-primary btn-sm',
-			    	click : function() {
-			    		if (!!fn) fn();
-			    		$(this).dialog("close");
-			    	}
-			    }
-			];
-		return buttons;
-	},
-	show : function(content, title, fn) {
-		this.settingHtml('dialog-message', content);
-		var buttons = this.getOk(fn);
-		this.buildDialog(title, buttons);
-	},
-	success: function(content, title, fn) {
-		this.settingHtml('dialog-success', content);
-		var buttons = this.getOk(fn);
-		this.buildDialog(title, buttons);
-	},
-	error: function(content, title, fn) {
-		this.settingHtml('dialog-error', content);
-		var buttons = this.getOk(fn);
-		this.buildDialog(title, buttons);
-	},
-	confirm : function(content, title, clickHandler, cancelHandler) {
-		this.settingHtml('dialog-confirm', content);
-		if (StringUtils.isBlank(title)) 
-			title = "系统询问";
-		var buttons = 
-		[
-			{
-				text: "确定",
-				class: 'btn btn-primary btn-sm',
-				click: function() {
-					clickHandler();
-					$(this).dialog("close");
-				}
-			},
-			{
-				text: "取消",
-				class: 'btn btn-default btn-sm',
-				click: function() {
-					if (cancelHandler) {
-						cancelHandler();
-					}
-					$( this ).dialog( "close" );
-				}
-			}
-		];
-		this.buildDialog(title, buttons);
-	},
-	
-	customConfirm : function(options) {
-		this.settingHtml((!options.class) ? 'dialog-confirm' : options.class, options.content);
-		if (StringUtils.isBlank(options.title)) 
-			title = "系统询问";
-		var buttons = 
-		[
-			{
-				text: StringUtils.isBlank(options.clickText) ? "确定" : options.clickText,
-				class: 'btn btn-primary btn-sm',
-				click: function() {
-					options.clickHandler();
-					$(this).dialog("close");
-				}
-			},
-			{
-				text: StringUtils.isBlank(options.cancelText) ? "取消" : options.cancelText,
-				class: 'btn btn-default btn-sm',
-				click: function() {
-					if (options.cancelHandler) {
-						options.cancelHandler();
-					}
-					$( this ).dialog( "close" );
-				}
-			}
-		];
-		this.buildDialog(title, buttons);
-	},
-	settingContentPadding: function() {
-		var outerHeight = $('#dialog').find('div.content').outerHeight();
-		if (outerHeight < 71)
-			return;
-		$('#dialog').find('div.content').css({
-			'padding-top' : 15,
-			'line-height' : 1.428571429
-		});
-	},
-	enabledMouseWheel : function(flag) {
-		$('body').attr('onmousewheel', 'return '+flag+';');
 	}
 };
 
@@ -635,7 +418,6 @@ var Modal = {
 jQuery(function() {
 	PJax.init();
 	Global.init();
-	Table.init();
 	Cookie.init();
 	Modal.init();
 });

@@ -3,7 +3,7 @@
     "http://tuckey.org/res/dtds/urlrewrite3.0.dtd">
 <urlrewrite>
 	<rule>
-		<from>^/index$</from>
+		<from>^/index.html$</from>
 		<to>/index.shtml</to>
 	</rule>
 </urlrewrite>
