@@ -31,6 +31,7 @@
 			else if (statusCode == 2) { // Stop
 				$message.addClass('label-default');
 				$tr.find('.start').show();
+				$tr.find('.remove').show();
 			}
 			else if (statusCode == 4) { // Wait
 				$message.addClass('label-info');

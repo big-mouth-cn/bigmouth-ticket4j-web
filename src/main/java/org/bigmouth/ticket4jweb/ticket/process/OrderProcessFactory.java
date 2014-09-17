@@ -45,6 +45,7 @@ import org.bigmouth.ticket4jweb.ticket.entity.Ticket4jSeat;
 import org.bigmouth.ticket4jweb.ticket.entity.WebSocketMessage;
 import org.bigmouth.ticket4jweb.ticket.entity.WebSocketMessageType;
 import org.bigmouth.ticket4jweb.ticket.process.thread.QueryTicketRunnable;
+import org.bigmouth.ticket4jweb.ticket.service.NotificationService;
 import org.bigmouth.ticket4jweb.ticket.service.OrderService;
 import org.bigmouth.ticket4jweb.ticket.service.SessionService;
 
@@ -67,6 +68,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     
     private final OrderService orderService;
     private final SessionService sessionService;
+    private final NotificationService notificationService;
     
     private Ticket ticket;
     private Order order;
@@ -76,11 +78,13 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     
     private WebSocketFactory webSocketFactory;
     
-    public OrderProcessFactory(OrderService orderService, SessionService sessionService) {
+    public OrderProcessFactory(OrderService orderService, SessionService sessionService, NotificationService notificationService) {
         Preconditions.checkNotNull(orderService, "orderService");
         Preconditions.checkNotNull(sessionService, "sessionService");
+        Preconditions.checkNotNull(notificationService, "notificationService");
         this.orderService = orderService;
         this.sessionService = sessionService;
+        this.notificationService = notificationService;
     }
     
     public void putStopQueue(String id) {
@@ -341,6 +345,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                             report.setUsername(session.getUsername());
                             report.setOrders(noComplete.getData().getOrderDBList());
                             ticketReport.write(report);
+                            notificationService.notification(report);
                             print(ticket4jOrder, Ticket4jOrder.COMPLETED, String.format("恭喜！(%s)车票预订成功，请尽快支付。", session.getUsername()));
                             PROCESS_QUEUE.remove(id);
                             return;

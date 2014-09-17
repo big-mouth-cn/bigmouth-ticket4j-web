@@ -21,12 +21,18 @@
 		init-method="init" destroy-method="destroy">
 		<constructor-arg ref="orderService" />
 		<constructor-arg ref="sessionService" />
+		<constructor-arg ref="notificationService" />
 		<property name="ticket" ref="ticket" />
 		<property name="order" ref="order" />
 		<property name="passCode" ref="passCode" />
 		<property name="antiUtils" ref="anti" />
 		<property name="ticketReport" ref="ticketReport" />
 		<property name="webSocketFactory" ref="webSocketFactory" />
+	</bean>
+	
+	
+	<bean id="notificationService" class="org.bigmouth.ticket4jweb.ticket.service.NotificationService">
+		<property name="sendUrl" value="${email.sender.url}" />
 	</bean>
 
 	<bean id="ticket4jDNSChecker" class="org.bigmouth.ticket4j.http.Ticket4jDNSChecker"

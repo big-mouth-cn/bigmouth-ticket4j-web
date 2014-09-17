@@ -124,16 +124,16 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">订票</a></li>
             <li class="dropdown">
-            	<a href="#" class="dropdown-toggle" data-toggle="dropdown">待支付订单<b class="caret"></b></a>
+            	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-shopping-cart"></span> 待支付订单<b class="caret"></b></a>
             	<ul id="noCompleteList" class="dropdown-menu">
             		<li class="dropdown-header">请选择账号</li>
             	</ul>
             </li>
-            <li><a href="http://www.12306.cn/mormhweb/zxdt/201305/t20130516_600.html" target="_blank">起售时刻表</a></li>
-            <li><a href="javascript:;" id="about">关于</a></li>
-            <li><a href="javascript:;" id="donations">捐助</a></li>
+            <li><a href="http://www.12306.cn/mormhweb/zxdt/201305/t20130516_600.html" target="_blank"><span class="glyphicon glyphicon-time"></span> 起售时刻表</a></li>
+            <li><a href="javascript:;" id="notification"><span class="glyphicon glyphicon-bell"></span> 成功通知</a></li>
+            <li><a href="javascript:;" id="about"><span class="glyphicon glyphicon-info-sign"></span> 关于</a></li>
+            <li><a href="javascript:;" id="donations"><span class="glyphicon glyphicon-credit-card"></span> 捐助</a></li>
           </ul>
         </div>
       </div>
@@ -187,7 +187,7 @@
 <script src="${ctx }/js/session/session.js"></script>
 <script src="${ctx }/js/ticket4j/order.js"></script>
 <script src="${ctx }/js/ticket4j/noComplete.js"></script>
-<script src="${ctx }/js/about/about.js"></script>
+<script src="${ctx }/js/package.js"></script>
 <script language="JavaScript">  
 function isSupport() {
 	if (navigator.userAgent.indexOf("MSIE 6.0") > 0 || 
