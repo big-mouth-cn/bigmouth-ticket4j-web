@@ -20,10 +20,15 @@
 					size : 'lg',
 					shown : function() {
 						$(window).bind('noComplete.load.successful', function(e, data) {
-							var orderDBList = data.data.orderDBList;
 							body.find('.loading').hide();
+							if (!data.data) {
+								body.find('.nodata').removeClass('hide');
+								body.find('.nodata').html('加载失败，请关闭后重试');
+							}
+							var orderDBList = data.data.orderDBList;
 							if (!orderDBList || orderDBList.length == 0) {
 								body.find('.nodata').removeClass('hide');
+								body.find('.nodata').html('暂时没有待支付的订单');
 							}
 							else {
 								$(orderDBList).each(function(i, order) {
@@ -94,7 +99,7 @@
 				var container =  $('<div>');
 				var loading = $('<div class="loading"><div class="span">正在加载，请稍候...</div></div>');
 				container.append(loading);
-				var none = $('<div class="nodata alert alert-info hide">暂时没有待支付的订单</div>');
+				var none = $('<div class="nodata alert alert-info hide"></div>');
 				container.append(none);
 				return container;
 			}

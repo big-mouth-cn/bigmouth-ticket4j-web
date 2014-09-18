@@ -10,7 +10,7 @@
 		updateStatus : function(data, tr) {
 			var statusCode = data.statusCode;
 			var message = data.message;
-			
+			console.log(data.statusCode + ',' +data.message);
 			var $tr = tr;
 			var $status = $tr.find('.status');
 			var $message = $('<span class="label"></span>');
@@ -19,6 +19,8 @@
 			$tr.find('.stop').hide();
 			$tr.find('.start').hide();
 			$tr.find('.remove').hide();
+			if (typeof (statusCode) == 'undefined')
+				return;
 			
 			if (statusCode == 1) { // Completed
 				$message.addClass('label-success');
@@ -175,6 +177,19 @@
 						$.notifier.error('无法获取已创建的订单！' + json.Message);
 					}
 				});
+			},
+			getPassengers: function(session) {
+				Ajax.post(window.baseUrl + '/session!getPassengers.shtml', {
+					session : JSON.stringify(session)
+				}, function(json) {
+					if (Response.ok(json)) {
+						session.setPassenger(json.Data);
+						$('#tblPassenger').trigger('render', [ session.passenger ]);
+					}
+					else {
+						$.notifier.error(json.Message);
+					}
+				});
 			}
 		},
 		
@@ -287,6 +302,7 @@
 			'			<tbody>'+
 			'			</tbody>'+
 			'		</table>'+
+			'		<span class="help-block">没有显示最新的乘车人数据？<a id="btnRefreshPassenger" href="javascript:;">点我</a>刷新下试试</span>'+
 			'	</div>'+
 			'  </div>'+
 			'  <div class="form-group">' +
@@ -320,6 +336,10 @@
 					$('#trainDate').datetimepicker('setEndDate', date.Format('yyyy-MM-dd'));
 					
 					var stationArray = [];
+					if (typeof (station_names) == 'undefined') {
+						$.notifier.error('加载地区码失败，请刷新后重试。');
+						return;
+					}
 					var stations = station_names.split('@');
 					$(stations).each(function(index, entry) {
 						if (StringUtils.isNotBlank(entry)) {
@@ -448,6 +468,7 @@
 					});
 					$('#tblPassenger').bind('render', function(evt, data) {
 						if (CollectionUtils.isNotEmpty(data)) {
+							$('#tblPassenger tbody').empty();
 							$(data).each(function(i, item) {
 								var tr = $('<tr>'+
 					    				'<td class="center"><input type="checkbox" value="'+item.passenger_name+'_'+item.passenger_id_no+'_'+item.passenger_type+'" data-name="'+item.passenger_name+'"></td>'+ // name_id
@@ -458,6 +479,9 @@
 								$('#tblPassenger tbody').append(tr);
 							});
 						}
+					});
+					$('#btnRefreshPassenger').bind('click', function() {
+						order.remote.getPassengers(session);
 					});
 					$('#tblPassenger').trigger('render', [ session.passenger ]);
 					$('#btnCreateOrder').bind('click', function() {

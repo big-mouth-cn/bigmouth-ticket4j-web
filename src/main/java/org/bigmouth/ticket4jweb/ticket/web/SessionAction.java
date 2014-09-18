@@ -3,11 +3,13 @@ package org.bigmouth.ticket4jweb.ticket.web;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.bigmouth.ticket4j.Initialize;
 import org.bigmouth.ticket4j.PassCode;
+import org.bigmouth.ticket4j.entity.Passenger;
 import org.bigmouth.ticket4j.http.Ticket4jHttpResponse;
 import org.bigmouth.ticket4j.utils.AntiUtils;
 import org.bigmouth.ticket4jweb.commons.FileService;
@@ -86,6 +88,22 @@ public class SessionAction extends Ticket4jActionSupport {
         catch (Exception e) {
             failed(e.getMessage());
             LOGGER.error("getSessions:", e);
+        }
+    }
+    
+    public void getPassengers() {
+        try {
+            Session session = getSession();
+            Ticket4jHttpResponse ticket4jHttpResponse = session.getTicket4jHttpResponse();
+            List<Passenger> passengers = sessionService.getPassengers(ticket4jHttpResponse);
+            if (CollectionUtils.isNotEmpty(passengers))
+                succeed(passengers);
+            else 
+                failed("没有常用联系人，有可能加载失败，请重试。");
+        }
+        catch (Exception e) {
+            failed(e.getMessage());
+            LOGGER.error("getPassengers:", e);
         }
     }
 

@@ -28,6 +28,7 @@
 		<property name="antiUtils" ref="anti" />
 		<property name="ticketReport" ref="ticketReport" />
 		<property name="webSocketFactory" ref="webSocketFactory" />
+		<property name="threadCount" value="1"/>
 	</bean>
 	
 	
@@ -61,7 +62,7 @@
 
 	<bean id="passCode" class="org.bigmouth.ticket4j.impl.DefaultPassCode">
 		<constructor-arg ref="ticket4jHttpClient" />
-		<property name="imgDir" value="../images/" />
+		<property name="imgDir" value="images/" />
 		<property name="uriGetLoginPassCode" value="${uri.login.passcode}" />
 		<property name="uriGetOrderPassCode" value="${uri.order.passcode}" />
 		<property name="uriCheckPassCode" value="${uri.check.passcode}" />

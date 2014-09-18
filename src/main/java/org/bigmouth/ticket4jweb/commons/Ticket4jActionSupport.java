@@ -9,6 +9,7 @@ import org.bigmouth.framework.util.DateUtils;
 import org.bigmouth.framework.web.action.json.JsonActionSupport;
 import org.bigmouth.ticket4j.entity.Response;
 import org.bigmouth.ticket4j.http.Ticket4jHttpResponse;
+import org.bigmouth.ticket4jweb.ticket.entity.Session;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
@@ -18,6 +19,12 @@ import com.google.gson.GsonBuilder;
 public class Ticket4jActionSupport extends JsonActionSupport {
     
     private static final long serialVersionUID = -1560801099509933609L;
+    
+    protected Session getSession() {
+        String parameter = getParameter("session");
+        Preconditions.checkArgument(StringUtils.isNotBlank(parameter), "获取Session失败");
+        return fromJson(parameter, Session.class);
+    }
     
     protected Ticket4jHttpResponse getTicket4jHttpResponse() {
         String parameter = getParameter("ticket4jHttpResponse");

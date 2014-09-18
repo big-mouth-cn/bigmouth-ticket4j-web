@@ -106,7 +106,7 @@
         <p>您知道不？现在您使用的是十年前的浏览器！</p>
         <p>假如世界上的更多的人都像您这样不愿意接受新技术、新科技，那么世界将被你们阻止进步。</p>
         <p>我们呼吁您，紧跟科技的脚步前行，您会发现更多的精彩。</p>
-        <p>下面您可以<a href="http://windows.microsoft.com/zh-cn/internet-explorer/downloads/ie-10/worldwide-languages" target="_blank">升级</a>您的浏览器版本或使用 <a href="http://www.google.com/intl/zh-CN/chrome/browser/" target="_blank">Chrome</a> 或 <a href="http://www.apple.com.cn/safari/" target="_blank">Safari</a> 等高级浏览器。</p>
+        <p>对不起，东皇钟暂时不支持IE浏览器。建议使用 <a href="http://www.google.com/intl/zh-CN/chrome/browser/" target="_blank">Chrome</a> 及Webkit内核的高级浏览器。</p>
         <hr>
         <p><i>如果您用的是360、猎豹等国内浏览器，请开启极速模式后再试。仍然出现此错误，请更换浏览器。</i></p>
     </div>
@@ -150,26 +150,28 @@
     	
     	<div class="panel panel-default">
     		<div class="panel-heading">订单处理</div>
-   			<table id="tblTickets" class="table">
-   				<thead>
-   					<tr>
-   						<th width="120">乘车日期</th>
-   						<th width="100">出发站</th>
-   						<th width="100">到达站</th>
-   						<th width="100">指定车次</th>
-   						<th width="100">黑名单</th>
-   						<th width="100">席别</th>
-   						<th width="100">乘车人</th>
-   						<th>状态</th>
-   						<th width="50"></th>
-   					</tr>
-   				</thead>
-   				<tbody>
-   					<tr class="empty">
-   						<td colspan="9"><div class="alert alert-info" style="margin-bottom: 0px;">暂时没有正在处理的订单，您可以单击“添加订单”开始进行购票。</div></td>
-   					</tr>
-   				</tbody>
-   			</table>
+    		<div class="table-responsive">
+	   			<table id="tblTickets" class="table">
+	   				<thead>
+	   					<tr>
+	   						<th width="120">乘车日期</th>
+	   						<th width="100">出发站</th>
+	   						<th width="100">到达站</th>
+	   						<th width="100">指定车次</th>
+	   						<th width="100">黑名单</th>
+	   						<th width="100">席别</th>
+	   						<th width="100">乘车人</th>
+	   						<th>状态</th>
+	   						<th width="50"></th>
+	   					</tr>
+	   				</thead>
+	   				<tbody>
+	   					<tr class="empty">
+	   						<td colspan="9"><div class="alert alert-info" style="margin-bottom: 0px;">暂时没有正在处理的订单，您可以单击“添加订单”开始进行购票。</div></td>
+	   					</tr>
+	   				</tbody>
+	   			</table>
+   			</div>
     		<div class="panel-footer">
     			<button id="btnAddTicket" class="btn btn-primary" data-toggle="popover" data-trigger="focus">添加订单</button>
     		</div>
@@ -183,26 +185,15 @@
     </div>
 </body>
 </html>
-<script src="https://kyfw.12306.cn/otn/resources/js/framework/station_name.js?station_version=1.809"></script>
+<script src="${ctx }/js/station_name.js"></script>
 <script src="${ctx }/js/session/session.js"></script>
 <script src="${ctx }/js/ticket4j/order.js"></script>
 <script src="${ctx }/js/ticket4j/noComplete.js"></script>
 <script src="${ctx }/js/package.js"></script>
 <script language="JavaScript">  
 function isSupport() {
-	if (navigator.userAgent.indexOf("MSIE 6.0") > 0 || 
-			navigator.userAgent.indexOf("MSIE 7.0") > 0 ||
-			navigator.userAgent.indexOf("MSIE 8.0") > 0) {
+	if (navigator.userAgent.indexOf("MSIE") > 0) {
 		return false;
-	}
-	if (navigator.userAgent.indexOf("Chrome") > 0) {
-		var reg = new RegExp('Chrome/\\d{2}');
-		var v = reg.exec(navigator.userAgent);
-		if (v.length > 0) {
-			if (v[0].split('/')[1] <= 32) {
-				return false;
-			}
-		}
 	}
 	return true;
 }

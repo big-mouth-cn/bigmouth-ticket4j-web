@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.bigmouth.ticket4j.PassCode;
 import org.bigmouth.ticket4j.User;
+import org.bigmouth.ticket4j.entity.Passenger;
 import org.bigmouth.ticket4j.entity.response.CheckPassCodeResponse;
 import org.bigmouth.ticket4j.entity.response.LoginSuggestResponse;
 import org.bigmouth.ticket4j.entity.response.QueryPassengerResponse;
@@ -40,6 +41,14 @@ public class SessionService {
         session.setSignIn(true);
         put(username, session);
         return session;
+    }
+    
+    public List<Passenger> getPassengers(Ticket4jHttpResponse ticket4jHttpResponse) {
+        QueryPassengerResponse passenger = user.queryPassenger(ticket4jHttpResponse);
+        if (null != passenger) {
+            return passenger.getData().getDatas();
+        }
+        return Lists.newArrayList();
     }
     
     public void put(String username, Session session) {

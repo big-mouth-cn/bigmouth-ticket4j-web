@@ -63,7 +63,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     private static final Map<String, Ticket4jOrder> STOP_QUEUE = Maps.newConcurrentMap();
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5, Executors.defaultThreadFactory());
     
-    private static final int QUERY_TICKET_THREAD_COUNT = 5;
+    private static final int QUERY_TICKET_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
     private static final ExecutorService QUERY_TICKET_EXECUTOR = Executors.newFixedThreadPool(QUERY_TICKET_THREAD_COUNT, Executors.defaultThreadFactory());
     
     private final OrderService orderService;
@@ -77,6 +77,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     private TicketReport ticketReport;
     
     private WebSocketFactory webSocketFactory;
+    private int threadCount = QUERY_TICKET_THREAD_COUNT;
     
     public OrderProcessFactory(OrderService orderService, SessionService sessionService, NotificationService notificationService) {
         Preconditions.checkNotNull(orderService, "orderService");
@@ -157,10 +158,10 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                         print(ticket4jOrder, Ticket4jOrder.STOP, "订单已停止");
                         return;
                     }
-                    print(ticket4jOrder, String.format("(%s)线程正在查票中", QUERY_TICKET_THREAD_COUNT));
+                    print(ticket4jOrder, String.format("(%s)线程正在查票中", threadCount));
                     try {
                         List<Future<QueryTicketResponse>> futures = Lists.newArrayList();
-                        for (int i = 0; i < QUERY_TICKET_THREAD_COUNT; i++) {
+                        for (int i = 0; i < threadCount; i++) {
                             Future<QueryTicketResponse> future = QUERY_TICKET_EXECUTOR.submit(new QueryTicketRunnable(ticket, ticket4jHttpResponse, condition));
                             futures.add(future);
                         }
@@ -413,5 +414,9 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
 
     public void setTicketReport(TicketReport ticketReport) {
         this.ticketReport = ticketReport;
+    }
+
+    public void setThreadCount(int threadCount) {
+        this.threadCount = threadCount;
     }
 }
