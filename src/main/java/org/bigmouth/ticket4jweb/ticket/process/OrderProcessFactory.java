@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -44,7 +43,6 @@ import org.bigmouth.ticket4jweb.ticket.entity.Ticket4jPassenger;
 import org.bigmouth.ticket4jweb.ticket.entity.Ticket4jSeat;
 import org.bigmouth.ticket4jweb.ticket.entity.WebSocketMessage;
 import org.bigmouth.ticket4jweb.ticket.entity.WebSocketMessageType;
-import org.bigmouth.ticket4jweb.ticket.process.thread.QueryTicketRunnable;
 import org.bigmouth.ticket4jweb.ticket.service.NotificationService;
 import org.bigmouth.ticket4jweb.ticket.service.OrderService;
 import org.bigmouth.ticket4jweb.ticket.service.SessionService;
@@ -58,13 +56,11 @@ import com.google.gson.Gson;
 public class OrderProcessFactory extends BaseLifeCycleSupport {
 
     private static final long MILLIS = 1000;
+    private static final int MAX_ORDER_PROCESS_THREAD = 5;
     
     private static final Map<String, Ticket4jOrder> PROCESS_QUEUE = Maps.newConcurrentMap();
     private static final Map<String, Ticket4jOrder> STOP_QUEUE = Maps.newConcurrentMap();
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5, Executors.defaultThreadFactory());
-    
-    private static final int QUERY_TICKET_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final ExecutorService QUERY_TICKET_EXECUTOR = Executors.newFixedThreadPool(QUERY_TICKET_THREAD_COUNT, Executors.defaultThreadFactory());
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(MAX_ORDER_PROCESS_THREAD, Executors.defaultThreadFactory());
     
     private final OrderService orderService;
     private final SessionService sessionService;
@@ -77,7 +73,6 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     private TicketReport ticketReport;
     
     private WebSocketFactory webSocketFactory;
-    private int threadCount = QUERY_TICKET_THREAD_COUNT;
     
     public OrderProcessFactory(OrderService orderService, SessionService sessionService, NotificationService notificationService) {
         Preconditions.checkNotNull(orderService, "orderService");
@@ -158,25 +153,16 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                         print(ticket4jOrder, Ticket4jOrder.STOP, "订单已停止");
                         return;
                     }
-                    print(ticket4jOrder, String.format("(%s)线程正在查票中", threadCount));
+                    print(ticket4jOrder, "正在查票中");
                     try {
-                        List<Future<QueryTicketResponse>> futures = Lists.newArrayList();
-                        for (int i = 0; i < threadCount; i++) {
-                            Future<QueryTicketResponse> future = QUERY_TICKET_EXECUTOR.submit(new QueryTicketRunnable(ticket, ticket4jHttpResponse, condition));
-                            futures.add(future);
+                        QueryTicketResponse queryTicketResponse = ticket.query(ticket4jHttpResponse, condition);
+                        if (null == queryTicketResponse)
+                            continue;
+                        allows = queryTicketResponse.getAllows();
+                        if (CollectionUtils.isNotEmpty(allows)) {
+                            break;
                         }
-                        for (Future<QueryTicketResponse> future : futures) {
-                            QueryTicketResponse queryTicketResponse = future.get();
-                            if (null != queryTicketResponse) {
-                                allows = queryTicketResponse.getAllows();
-                                if (CollectionUtils.isNotEmpty(allows)) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (CollectionUtils.isEmpty(allows)) {
-                            sleep(MILLIS);
-                        }
+                        sleep(MILLIS);
                     }
                     catch (Exception e) {
                         print(ticket4jOrder, Ticket4jOrder.RUNTIME, e.getMessage());
@@ -312,6 +298,11 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                         confirmResponse = order.confirmSingleForQueue(ticket4jHttpResponse, queueRequest);
                         if (null == confirmResponse)
                             continue;
+                        if (!confirmResponse.isContinue() && 
+                                StringUtils.equals("包含未付款订单", confirmResponse.getErrorMessage())) {
+                            print(ticket4jOrder, "包含未付款订单");
+                            return;
+                        }
                     } while (!confirmResponse.isContinue());
                     
                     // 等待处理结果
@@ -414,9 +405,5 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
 
     public void setTicketReport(TicketReport ticketReport) {
         this.ticketReport = ticketReport;
-    }
-
-    public void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
     }
 }

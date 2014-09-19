@@ -10,7 +10,7 @@
 		updateStatus : function(data, tr) {
 			var statusCode = data.statusCode;
 			var message = data.message;
-			console.log(data.statusCode + ',' +data.message);
+
 			var $tr = tr;
 			var $status = $tr.find('.status');
 			var $message = $('<span class="label"></span>');

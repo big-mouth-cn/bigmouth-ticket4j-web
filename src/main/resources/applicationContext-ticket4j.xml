@@ -28,7 +28,6 @@
 		<property name="antiUtils" ref="anti" />
 		<property name="ticketReport" ref="ticketReport" />
 		<property name="webSocketFactory" ref="webSocketFactory" />
-		<property name="threadCount" value="1"/>
 	</bean>
 	
 	

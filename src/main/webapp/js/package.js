@@ -104,6 +104,7 @@
 								to : $emailAddress.val()
 							}, function(json) {
 								if (Response.ok(json)) {
+									address = $emailAddress.val();
 									$.notifier.success('成功通知接收邮箱保存成功');
 								}
 								else {
