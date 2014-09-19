@@ -31,7 +31,7 @@ public class OrderAction extends Ticket4jActionSupport {
             String order = getParameter("order");
             Preconditions.checkArgument(StringUtils.isNotBlank(order), "非法的请求，参数有误");
             Ticket4jOrder entity = fromJson(order, Ticket4jOrder.class);
-            orderService.write(entity);
+            orderService.save(entity);
             orderProcessFactory.putPool(entity.getId());
             succeed(orderService.getOrder(entity.getId())); // Get new status.
         }
@@ -52,7 +52,7 @@ public class OrderAction extends Ticket4jActionSupport {
         }
         catch (Exception e) {
             failed(e.getMessage());
-            LOGGER.error("delete:", e);
+            LOGGER.error("start:", e);
         }
     }
     
@@ -65,7 +65,7 @@ public class OrderAction extends Ticket4jActionSupport {
         }
         catch (Exception e) {
             failed(e.getMessage());
-            LOGGER.error("delete:", e);
+            LOGGER.error("stop:", e);
         }
     }
     
@@ -79,7 +79,7 @@ public class OrderAction extends Ticket4jActionSupport {
         }
         catch (Exception e) {
             failed(e.getMessage());
-            LOGGER.error("delete:", e);
+            LOGGER.error("remove:", e);
         }
     }
     

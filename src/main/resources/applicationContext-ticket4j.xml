@@ -2,13 +2,18 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 	<bean id="fileService" class="org.bigmouth.ticket4jweb.commons.FileService"></bean>
+	
+	<bean id="fileSessionDao" class="org.bigmouth.ticket4jweb.ticket.dao.FileSessionDao" init-method="init" destroy-method="destroy" />
+	<bean id="fileOrderDao" class="org.bigmouth.ticket4jweb.ticket.dao.FileOrderDao" init-method="init" destroy-method="destroy" />
 
 	<bean id="sessionService" class="org.bigmouth.ticket4jweb.ticket.service.SessionService">
 		<property name="user" ref="user" />
 		<property name="passCode" ref="passCode" />
+		<property name="sessionDao" ref="fileSessionDao" />
 	</bean>
 	<bean id="orderService" class="org.bigmouth.ticket4jweb.ticket.service.OrderService">
 		<property name="order" ref="order" />
+		<property name="orderDao" ref="fileOrderDao" />
 	</bean>
 
 	<bean class="org.bigmouth.ticket4jweb.ticket.process.SessionProcessFactory" init-method="init" destroy-method="destroy">
@@ -17,8 +22,7 @@
 		<property name="webSocketFactory" ref="webSocketFactory" />
 	</bean>
 
-	<bean id="orderProcessFactory" class="org.bigmouth.ticket4jweb.ticket.process.OrderProcessFactory"
-		init-method="init" destroy-method="destroy">
+	<bean id="orderProcessFactory" class="org.bigmouth.ticket4jweb.ticket.process.OrderProcessFactory" init-method="init" destroy-method="destroy">
 		<constructor-arg ref="orderService" />
 		<constructor-arg ref="sessionService" />
 		<constructor-arg ref="notificationService" />
@@ -34,6 +38,8 @@
 	<bean id="notificationService" class="org.bigmouth.ticket4jweb.ticket.service.NotificationService">
 		<property name="sendUrl" value="${email.sender.url}" />
 	</bean>
+	
+	<!-- Ticket4j Core -->
 
 	<bean id="ticket4jDNSChecker" class="org.bigmouth.ticket4j.http.Ticket4jDNSChecker"
 		init-method="init" destroy-method="destroy">

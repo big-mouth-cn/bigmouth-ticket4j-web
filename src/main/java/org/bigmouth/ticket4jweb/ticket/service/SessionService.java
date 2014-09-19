@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bigmouth.framework.util.BaseLifeCycleSupport;
 import org.bigmouth.ticket4j.PassCode;
 import org.bigmouth.ticket4j.User;
 import org.bigmouth.ticket4j.entity.Passenger;
@@ -11,6 +12,7 @@ import org.bigmouth.ticket4j.entity.response.CheckPassCodeResponse;
 import org.bigmouth.ticket4j.entity.response.LoginSuggestResponse;
 import org.bigmouth.ticket4j.entity.response.QueryPassengerResponse;
 import org.bigmouth.ticket4j.http.Ticket4jHttpResponse;
+import org.bigmouth.ticket4jweb.ticket.dao.SessionDao;
 import org.bigmouth.ticket4jweb.ticket.entity.Session;
 
 import com.google.common.base.Preconditions;
@@ -18,9 +20,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 
-public class SessionService {
+public class SessionService extends BaseLifeCycleSupport {
     
     private static final Map<String, Session> SESSIONS = Maps.newConcurrentMap();
+    private SessionDao sessionDao;
+    
     private User user;
     private PassCode passCode;
 
@@ -52,6 +56,7 @@ public class SessionService {
     }
     
     public void put(String username, Session session) {
+        sessionDao.insert(session);
         SESSIONS.put(username, session);
     }
     
@@ -63,6 +68,19 @@ public class SessionService {
         return list;
     }
     
+    @Override
+    protected void doInit() {
+        List<Session> sessions = sessionDao.queryAll();
+        for (Session session : sessions) {
+            SESSIONS.put(session.getUsername(), session);
+        }
+    }
+
+    @Override
+    protected void doDestroy() {
+        SESSIONS.clear();
+    }
+
     public Session get(String username) {
         return SESSIONS.get(username);
     }
@@ -73,5 +91,9 @@ public class SessionService {
 
     public void setPassCode(PassCode passCode) {
         this.passCode = passCode;
+    }
+
+    public void setSessionDao(SessionDao sessionDao) {
+        this.sessionDao = sessionDao;
     }
 }

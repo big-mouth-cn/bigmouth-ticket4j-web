@@ -372,7 +372,7 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
     }
     
     private void print(Ticket4jOrder order) {
-        orderService.write(order);
+        orderService.save(order);
         WebSocketMessage<Ticket4jOrder> message = new WebSocketMessage<Ticket4jOrder>(WebSocketMessageType.ORDER_EVENT, order);
         String text = new Gson().toJson(message);
         webSocketFactory.getWebSocket().print(text);
