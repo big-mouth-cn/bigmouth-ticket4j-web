@@ -6,12 +6,12 @@
 	<bean id="fileSessionDao" class="org.bigmouth.ticket4jweb.ticket.dao.FileSessionDao" init-method="init" destroy-method="destroy" />
 	<bean id="fileOrderDao" class="org.bigmouth.ticket4jweb.ticket.dao.FileOrderDao" init-method="init" destroy-method="destroy" />
 
-	<bean id="sessionService" class="org.bigmouth.ticket4jweb.ticket.service.SessionService">
+	<bean id="sessionService" class="org.bigmouth.ticket4jweb.ticket.service.SessionService" init-method="init" destroy-method="destroy">
 		<property name="user" ref="user" />
 		<property name="passCode" ref="passCode" />
 		<property name="sessionDao" ref="fileSessionDao" />
 	</bean>
-	<bean id="orderService" class="org.bigmouth.ticket4jweb.ticket.service.OrderService">
+	<bean id="orderService" class="org.bigmouth.ticket4jweb.ticket.service.OrderService" init-method="init" destroy-method="destroy">
 		<property name="order" ref="order" />
 		<property name="orderDao" ref="fileOrderDao" />
 	</bean>

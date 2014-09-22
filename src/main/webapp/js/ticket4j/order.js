@@ -60,6 +60,9 @@
 				$(sessions).each(function(i, item) {
 					var li = $('<li class="users-internal"></li>');
 					var btn = $('<button class="btn btn-default btn-sm btnAddOrder" data-username="'+item.username+'">'+item.username+'</button>');
+					if (!item.signIn) {
+						btn.addClass('disabled');
+					}
 					content.find('ul').append(li.append(btn));
 				});
 				body.append(content);

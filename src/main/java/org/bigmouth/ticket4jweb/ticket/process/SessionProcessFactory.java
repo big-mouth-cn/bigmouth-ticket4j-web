@@ -3,7 +3,6 @@ package org.bigmouth.ticket4jweb.ticket.process;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import org.bigmouth.framework.util.BaseLifeCycleSupport;
 import org.bigmouth.framework.web_socket.WebSocketFactory;
@@ -23,7 +22,7 @@ public class SessionProcessFactory extends BaseLifeCycleSupport {
 
     public static final long SLEEP_TIME = 10 * 60 * 1000; // 10 minutes.
     
-    private final ExecutorService executor;
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
     private final SessionService sessionService;
     private final User user;
     
@@ -34,20 +33,19 @@ public class SessionProcessFactory extends BaseLifeCycleSupport {
         Preconditions.checkNotNull(user, "user");
         this.sessionService = sessionService;
         this.user = user;
-        this.executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-            
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r);
-                thread.setName("Session");
-                return thread;
-            }
-        });
+    }
+    
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e) {
+        }
     }
     
     @Override
     protected void doInit() {
-        executor.submit(new Runnable() {
+        EXECUTOR.submit(new Runnable() {
             
             @Override
             public void run() {
@@ -63,11 +61,7 @@ public class SessionProcessFactory extends BaseLifeCycleSupport {
                         String text = new Gson().toJson(message);
                         webSocketFactory.getWebSocket().print(text);
                     }
-                    try {
-                        Thread.sleep(SLEEP_TIME);
-                    }
-                    catch (InterruptedException e) {
-                    }
+                    sleep(SLEEP_TIME);
                 }
             }
         });
@@ -75,7 +69,7 @@ public class SessionProcessFactory extends BaseLifeCycleSupport {
 
     @Override
     protected void doDestroy() {
-        this.executor.shutdownNow();
+        EXECUTOR.shutdownNow();
     }
 
     public void setWebSocketFactory(WebSocketFactory webSocketFactory) {

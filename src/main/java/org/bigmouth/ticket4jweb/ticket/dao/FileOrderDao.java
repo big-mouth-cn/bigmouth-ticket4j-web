@@ -85,7 +85,7 @@ public class FileOrderDao extends BaseLifeCycleSupport implements OrderDao {
 
     private void mkdirsIfNotExists() {
         File file = new File(ORDER_DIR);
-        if (file.isDirectory() && !file.exists()) {
+        if (!file.exists()) {
             file.mkdirs();
         }
     }

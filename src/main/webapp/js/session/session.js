@@ -48,42 +48,30 @@
 	
 	var internal = {
 		init: function() {
-			$('#users').bind('append', function(evt, data) {
-				var text = data.signIn ? '已登陆' : '超时';
-				var li = $('<li class="item"><span>'+data.username+'('+text+')</span></li>');
-				$('#users').append(li);
-			});
-			
 			this.addEventListener();
 			this.getSessions();
 		},
 		
+		render : {
+			append: function(session) {
+				var text = session.signIn ? '已登陆' : '超时';
+				var li = $('<li class="item"><span>'+session.username+'('+text+')</span></li>');
+				li.attr('id', session.id);
+				$('#users').append(li);
+			},
+			update: function(session) {
+				var $this = $('#'+session.id);
+				if (session.signIn) {
+					
+				}
+			}
+		},
+		
 		addEventListener: function() {
-			$(window).bind('sessions.change', function(evt, sessions) {
-				var lis = [];
-				lis.push($('<li class="dropdown-header">请选择账号</li>'));
-				$(sessions).each(function(i, session) {
-					var $li = $('<li>');
-					$li.append('<a href="javascript:;">' + session.username + '</a>');
-					$li.click(function() {
-						$(window).trigger('noComplete.open', [ session ]);
-					});
-					lis.push($li);
-				});
-				$('#noCompleteList').empty();
-				$(lis).each(function() {
-					$('#noCompleteList').append($(this));
-				});
+			$(window).bind('SESSION_EVENT', function(evt, data) {
 			});
-			$(window).bind('get.sessions', function(evt, data) {
-				$(data).each(function(i, item) {
-					var session = new Session(item.username);
-					session.setResponse(item.response);
-					session.setPassenger(item.passengers);
-					session.setTicket4jHttpResponse(item.ticket4jHttpResponse);
-					session.setSignIn(item.signIn);
-					internal.sessionChangeHandler(session);
-				});
+			$('#users').bind('append', function(evt, data) {
+				internal.render.append(data);
 			});
 			$('#btnAddSession').click(function() {
 				var body = 
@@ -171,7 +159,7 @@
 							session.setPassenger(data.passengers);
 							session.setTicket4jHttpResponse(ticket4jHttpResponse);
 							session.setSignIn(data.signIn);
-							internal.sessionChangeHandler(session);
+							internal.append(session);
 						});
 						$(window).bind(Event.LOGIN_FAILED, function(evt) {
 							$btnLogin.button('reset');
@@ -189,10 +177,9 @@
 			});
 		},
 		
-		sessionChangeHandler : function(session) {
+		append : function(session) {
 			sessions.push(session);
 			$('#users').trigger('append', [ session ]);
-			// Sessions Change
 			$(window).trigger('sessions.change', [ sessions ]);
 		},
 		
@@ -241,7 +228,15 @@
 		getSessions: function() {
 			Ajax.get(window.baseUrl + '/session!getSessions.shtml', {}, function(json) {
 				if (Response.ok(json)) {
-					$(window).trigger('get.sessions', [ json.Data ]);
+					var data = json.Data;
+					$(data).each(function(i, item) {
+						var session = new Session(item.username);
+						session.setResponse(item.response);
+						session.setPassenger(item.passengers);
+						session.setTicket4jHttpResponse(item.ticket4jHttpResponse);
+						session.setSignIn(item.signIn);
+						internal.append(session);
+					});
 				}
 				else {
 					$.notifier.error(json.Message);

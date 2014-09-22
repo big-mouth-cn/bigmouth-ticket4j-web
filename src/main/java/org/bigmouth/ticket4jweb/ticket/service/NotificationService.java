@@ -64,7 +64,7 @@ public class NotificationService {
             else {
                 content.append("成功预订到了车票，");
             }
-            content.append("请立即使用账号(<b>").append(report.getUsername()).append("</b>)登录12306客运服务后台进行支付！(<b>");
+            content.append("请立即使用账号(<b>").append(report.getUsername()).append("</b>)登录12306客运服务后台进行支付！<b>");
             send(to, content.toString());
         }
         catch (Exception e) {

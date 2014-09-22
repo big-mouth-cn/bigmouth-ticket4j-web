@@ -109,7 +109,9 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
                 }
                 Session crt = sessionService.get(session.getUsername());
                 if (!crt.isSignIn()) {
-                    print(ticket4jOrder, Ticket4jOrder.SESSION_TIME_OUT, "账户会话已经超时，需要重新登陆并创建订单。");
+                    print(ticket4jOrder, Ticket4jOrder.SESSION_TIME_OUT, "账户会话已经超时，需要重新登陆。");
+                    PROCESS_QUEUE.remove(id);
+                    return;
                 }
                 Ticket4jHttpResponse ticket4jHttpResponse = crt.getTicket4jHttpResponse();
                 String trainDate = ticket4jOrder.getTrainDate();
@@ -350,7 +352,12 @@ public class OrderProcessFactory extends BaseLifeCycleSupport {
 
     @Override
     protected void doInit() {
-        // TODO
+        List<Ticket4jOrder> orders = orderService.getOrders();
+        for (Ticket4jOrder ticket4jOrder : orders) {
+            if (ticket4jOrder.getStatusCode() != Ticket4jOrder.COMPLETED) {
+                print(ticket4jOrder, Ticket4jOrder.STOP, "系统初始化，订单已停止");
+            }
+        }
     }
     
     private void sleep(long millis) {
