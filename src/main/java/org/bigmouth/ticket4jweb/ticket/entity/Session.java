@@ -13,17 +13,26 @@ public class Session implements Serializable {
     private static final long serialVersionUID = 185350595451299232L;
 
     private String username;
+    private String password;
     private LoginSuggestResponse response;
     private Ticket4jHttpResponse ticket4jHttpResponse;
     private List<Passenger> passengers;
     private boolean signIn = false;
-
+    
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public LoginSuggestResponse getResponse() {

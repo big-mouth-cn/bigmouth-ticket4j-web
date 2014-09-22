@@ -8,15 +8,17 @@
 
 	$(function() {
 		initSocket();
-		setInterval(function() {
-			if (!initialized) {
-				initSocket();
-			}
-		}, CHECK_TIME_MILLIS);
+//		setInterval(function() {
+//			if (!initialized) {
+//				initSocket();
+//			}
+//		}, CHECK_TIME_MILLIS);
 	});
 	
 	function initSocket() {
-		socket = new WebSocket(window.websocket);
+		if (null == socket)
+			socket = new WebSocket(window.websocket);
+		
 		socket.onopen = function(event) {
 			initialized = true;
 		};

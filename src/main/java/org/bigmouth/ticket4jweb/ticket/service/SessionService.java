@@ -38,6 +38,7 @@ public class SessionService extends BaseLifeCycleSupport {
         
         Session session = new Session();
         session.setUsername(username);
+        session.setPassword(passwd);
         session.setResponse(response);
         session.setTicket4jHttpResponse(ticket4jHttpResponse);
         if (null != passenger)

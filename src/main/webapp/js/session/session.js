@@ -15,10 +15,15 @@
 	
 	function Session(username) {
 		this.username = username;
+		this.password;
 		this.passenger;
 		this.response;
 		this.ticket4jHttpResponse;
 		this.signIn = false;
+		
+		this.setPassword = function(password) {
+			this.password = password;
+		};
 		this.setPassenger = function(passenger) {
 			this.passenger = passenger;
 		};
@@ -54,27 +59,47 @@
 		
 		render : {
 			append: function(session) {
-				var text = session.signIn ? '已登陆' : '超时';
-				var li = $('<li class="item"><span>'+session.username+'('+text+')</span></li>');
-				li.attr('id', session.id);
-				$('#users').append(li);
-			},
-			update: function(session) {
-				var $this = $('#'+session.id);
-				if (session.signIn) {
-					
+				var $this = $('#'+ $.md5(session.username));
+				if ($this.length == 0) {
+					// Does not exist
+					var span = $('<span>');
+					span.append(session.username);
+					var resign = $('<a href="javascript:;" class="resign" style="font-size:12px;">(重新登陆)</a>');
+					resign.data('session', session);
+					resign.bind('click', function() {
+						internal.openDialog($(this).data('session'));
+					});
+					span.append(resign);
+					if (session.signIn) {
+						resign.hide();
+					}
+					var li = $('<li class="item">');
+					li.append(span);
+					li.attr('id', $.md5(session.username));
+					$('#users').append(li);
+				}
+				else {
+					if (session.signIn) {
+						$this.find('.resign').hide();
+					}
+					else {
+						$this.find('.resign').show();
+					}
 				}
 			}
 		},
 		
 		addEventListener: function() {
 			$(window).bind('SESSION_EVENT', function(evt, data) {
-			});
-			$('#users').bind('append', function(evt, data) {
-				internal.render.append(data);
+				internal.append(data);
 			});
 			$('#btnAddSession').click(function() {
-				var body = 
+				internal.openDialog(null);
+			});
+		},
+		
+		openDialog : function(session) {
+			var body = 
 				$('<form role="form">'+
 				'  <div class="form-group">'+
 				'	<label for="loginName">登录名</label>'+
@@ -107,16 +132,22 @@
 						var $loginName = body.find('#loginName');
 						var $password = body.find('#password');
 						var $loginPassCode = body.find('#loginPassCode');
-						$loginName.blur(function() {
-							$(sessions).each(function(i, item) {
-								if (item.username == $loginName.val()) {
-									$.notifier.info($loginName.val() + ' 已经登陆，请登陆其他账户。');
-									$loginName.val('');
-									$loginName.focus();
-									return;
-								}
+						if (session) {
+							$loginName.val(session.username);
+							$password.val(session.password);
+						}
+						if (!session) {
+							$loginName.blur(function() {
+								$(sessions).each(function(i, item) {
+									if (item.username == $loginName.val()) {
+										$.notifier.info($loginName.val() + ' 已经登陆，请登陆其他账户。');
+										$loginName.val('');
+										$loginName.focus();
+										return;
+									}
+								});
 							});
-						});
+						}
 						$btnLogin.click(function() {
 							if (StringUtils.isBlank($loginName.val())) {
 								$(loginName).focus(); return;
@@ -155,6 +186,7 @@
 							Modal.close();
 							
 							var session = new Session($loginName.val());
+							session.setPassword(data.password);
 							session.setResponse(data.response);
 							session.setPassenger(data.passengers);
 							session.setTicket4jHttpResponse(ticket4jHttpResponse);
@@ -174,12 +206,21 @@
 						$(window).unbind(Event.LOGIN_FAILED);
 					}
 				});
-			});
 		},
 		
 		append : function(session) {
-			sessions.push(session);
-			$('#users').trigger('append', [ session ]);
+			var contains = false;
+			for (var i = 0; i < sessions.length; i++) {
+				var item = sessions[i];
+				if (item.username == session.username) {
+					item = session;
+					contains = true;
+					break;
+				}
+			}
+			if (!contains)
+				sessions.push(session);
+			internal.render.append(session);
 			$(window).trigger('sessions.change', [ sessions ]);
 		},
 		
@@ -231,6 +272,7 @@
 					var data = json.Data;
 					$(data).each(function(i, item) {
 						var session = new Session(item.username);
+						session.setPassword(item.password);
 						session.setResponse(item.response);
 						session.setPassenger(item.passengers);
 						session.setTicket4jHttpResponse(item.ticket4jHttpResponse);

@@ -30,6 +30,7 @@
 	<script src="${ctx }/js/datetimepicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 	<script src="${ctx }/js/autocomplete/jquery.autocomplete.min.js"></script>
 	<script src="${ctx }/js/notifier/allen-notifier.js"></script>
+	<script src="${ctx }/js/jquery.md5.js"></script>
 	<script src="${ctx }/js/jquery.sortable.js"></script>
 	<script src="${ctx }/js/jquery.cookie.js"></script>
 	<script src="${ctx }/js/jquery.pjax.js"></script>
